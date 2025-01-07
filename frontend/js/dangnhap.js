@@ -1,6 +1,9 @@
+// Config
+const API_URL = "http://localhost:8081";
+
 const khung = document.querySelector(".khung"),
-  dangKy = document.querySelector(".dangky-link"),
-  dangNhap = document.querySelector(".dangnhap-link");
+    dangKy = document.querySelector(".dangky-link"),
+    dangNhap = document.querySelector(".dangnhap-link");
 
 // js code xuất hiện đăng ký và đăng nhập
 dangKy.addEventListener("click", () => {
@@ -13,7 +16,7 @@ dangNhap.addEventListener("click", () => {
 // kiểm tra định dạng email
 const kiemTraEmail = (email) => {
   return email.match(
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   );
 };
 
@@ -47,10 +50,10 @@ function xacnhan(event) {
   }
 
   if (
-    giatriemail == "" ||
-    giatrimatkhau == "" ||
-    !kiemTraEmail(giatriemail) ||
-    giatrimatkhau.length < 8
+      giatriemail == "" ||
+      giatrimatkhau == "" ||
+      !kiemTraEmail(giatriemail) ||
+      giatrimatkhau.length < 8
   ) {
     return false;
   } else {
@@ -67,11 +70,11 @@ function xacnhandangky(event) {
   var giatriemaildangky = document.getElementById("emaildangky").value.trim();
   var giatritendangky = document.getElementById("tendangky").value.trim();
   var giatrimatkhaudangky = document
-    .getElementById("matkhaudangky")
-    .value.trim();
+      .getElementById("matkhaudangky")
+      .value.trim();
   var giatrimatkhaudangkynhaplai = document
-    .getElementById("matkhaudangkynhaplai")
-    .value.trim();
+      .getElementById("matkhaudangkynhaplai")
+      .value.trim();
 
   var emaildangky = document.getElementById("emaildangky");
   var tendangky = document.getElementById("tendangky");
@@ -119,17 +122,17 @@ function xacnhandangky(event) {
     loidangky("loi_mat_khaudangkynhaplai", "");
   }
   console.log("btn dang ký")
-  
+
   if (
-    giatriemaildangky == "" ||
-    giatrimatkhaudangky == "" ||
-    !kiemTraEmail(giatriemaildangky) ||
-    giatrimatkhaudangky.length < 8 ||
-    giatritendangky == "" ||
-    giatrimatkhaudangkynhaplai == "" ||
-    giatrimatkhaudangkynhaplai.length < 8
+      giatriemaildangky == "" ||
+      giatrimatkhaudangky == "" ||
+      !kiemTraEmail(giatriemaildangky) ||
+      giatrimatkhaudangky.length < 8 ||
+      giatritendangky == "" ||
+      giatrimatkhaudangkynhaplai == "" ||
+      giatrimatkhaudangkynhaplai.length < 8
   ) {
-   
+
     return false;
   } else {
     dangky();
@@ -141,31 +144,39 @@ function xacnhandangky(event) {
 function loidangky(id, message) {
   document.getElementById(id).innerHTML = message;
 }
-const api = "http://localhost:8081";
 
 async function dangnhap(event) {
   event.preventDefault();
-  fetch(`http://localhost:8081/api/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username: document.getElementById("email").value,
-      password: document.getElementById("matkhau").value,
-    }),
-  })
-    .then((res) => res.json())
-    .then((dt) => {
-      console.log(dt);
-      localStorage.setItem("token", dt.token);
-      // navigation home
-      window.location.href = "index.html";
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("matkhau").value;
+
+  try {
+    const response = await fetch(`${API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "username": email,
+        "password": password
+      }),
     });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      localStorage.setItem("token", data.token);
+      window.location.href = "index.html";
+    } else {
+      console.log("error", response.status, await response.text());
+    }
+  } catch (error) {
+    console.error("error", error);
+  }
 }
 async function dangky() {
-  
-  const res = await fetch(`http://localhost:8081/api/auth/register`, {
+
+  const res = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -178,8 +189,4 @@ async function dangky() {
   })
   // reload
   window.location.href = "dangnhap.html";
-  
-
-
-   
 }
